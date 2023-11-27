@@ -68,6 +68,9 @@ def create_event(service, title, start_datetime, end_datetime, description):
     return event.get("htmlLink")
 
 
+# Duration choices
+duration_choices = ["15 minutes", "30 minutes", "1 hour"]
+
 # Define the window's contents for PySimpleGUI
 layout = [
     [sg.Text("Create an Event in Google Calendar")],
@@ -78,6 +81,10 @@ layout = [
         sg.CalendarButton("Choose Date", target="event_date", format="%Y-%m-%d"),
     ],
     [sg.Text("Description"), sg.InputText(key="description")],
+    [
+        sg.Text("Event Duration"),
+        sg.Combo(duration_choices, default_value="30 minutes", key="duration"),
+    ],
     [sg.Button("Find Free Time"), sg.Button("Submit"), sg.Button("Cancel")],
     [sg.Text("", size=(40, 1), key="free_time_info")],
 ]
