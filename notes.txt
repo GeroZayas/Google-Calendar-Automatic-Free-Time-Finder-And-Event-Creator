@@ -1,0 +1,4 @@
+FIX -> make sure it finds a free slot the same day but after current time
+ADD-> button to clear all forms if wanted
+ADD-> events of 10 minutes and 2 hours
+ADD-> always leave 5 minutes between events
