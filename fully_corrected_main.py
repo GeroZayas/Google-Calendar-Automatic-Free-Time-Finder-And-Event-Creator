@@ -25,6 +25,15 @@ def find_free_time(service, date, duration_str):
 
     timezone = pytz.timezone("Europe/Madrid")
     start_date = datetime.datetime.strptime(date, "%Y-%m-%d").replace(tzinfo=timezone)
+
+    # Get current time with timezone
+    current_time = datetime.datetime.now(pytz.timezone("Europe/Madrid"))
+
+    # Check if the start_date is today and before the current time
+    if start_date.date() == current_time.date() and start_date < current_time:
+        # If it's the same day but the time has already passed, start from the current time
+        start_date = current_time
+
     end_date = start_date + datetime.timedelta(days=1)
 
     # Define the start and end times for the search window (7 AM to 11 PM)
@@ -57,6 +66,9 @@ def find_free_time(service, date, duration_str):
             current_time,
         )
 
+        # Add a 10-minute buffer after each busy period
+        current_time += datetime.timedelta(minutes=10)
+
     while current_time + duration <= search_end_time:
         free_slots.append(current_time.isoformat())
         current_time += datetime.timedelta(minutes=15)
@@ -80,37 +92,95 @@ def create_event(service, title, start_datetime, end_datetime, description, colo
     return event.get("htmlLink")
 
 
+sg.theme("BrightColors")
+# sg.theme("Topanga")
+
 # Duration choices
 duration_choices = ["15 minutes", "30 minutes", "1 hour"]
 
-# Define the window's contents for PySimpleGUI
+# Font and color configurations
+title_font = ("Any", 14, "bold")
+label_font = ("Any", 12)
+button_font = ("Any", 12, "bold")
+input_font = ("Any", 12)
+button_color = ("black", "gold")
+background_color = "lightgrey"
+
+# Define the layout with style enhancements
 layout = [
-    [sg.Text("Create an Event in Google Calendar")],
-    [sg.Text("Event Title"), sg.InputText(key="title")],
     [
-        sg.Text("Event Date"),
-        sg.Input(key="event_date"),
-        sg.CalendarButton("Choose Date", target="event_date", format="%Y-%m-%d"),
+        sg.Text(
+            "Create an Event in Google Calendar",
+            font=title_font,
+            justification="center",
+            pad=(0, 10),
+        )
     ],
-    [sg.Text("Description"), sg.InputText(key="description")],
     [
-        sg.Text("Event Duration"),
-        sg.Combo(duration_choices, default_value="30 minutes", key="duration"),
+        sg.Frame(
+            layout=[
+                [
+                    sg.Text("Event Title", font=label_font),
+                    sg.InputText(key="title", font=input_font),
+                ],
+                [
+                    sg.Text("Event Date", font=label_font),
+                    sg.Input(key="event_date", font=input_font),
+                    sg.CalendarButton(
+                        "Choose Date",
+                        target="event_date",
+                        format="%Y-%m-%d",
+                        button_color=button_color,
+                        font=button_font,
+                    ),
+                ],
+                [
+                    sg.Text("Description", font=label_font),
+                    sg.InputText(key="description", font=input_font),
+                ],
+                [
+                    sg.Text("Event Duration", font=label_font),
+                    sg.Combo(
+                        duration_choices,
+                        default_value="30 minutes",
+                        key="duration",
+                        font=input_font,
+                    ),
+                ],
+            ],
+            title="Event Details",
+            font=("Any", 12, "bold"),
+            title_color="dark green",
+        )
     ],
-    # [sg.Button("Find Free Time"), sg.Button("Submit"), sg.Button("Cancel")],
-    [sg.Button("Submit"), sg.Button("Cancel")],
-    # [sg.Text("", size=(40, 1), key="free_time_info")],
+    [
+        sg.Button(
+            "Submit",
+            font=button_font,
+            button_color=button_color,
+        ),
+        sg.Button("Clear", font=button_font, button_color=button_color),
+        sg.Button("Close", font=button_font, button_color="red"),
+    ],
 ]
 
-# Create the window
-window = sg.Window("Event Creator", layout)
+# Create the window with the layout
+window = sg.Window(
+    "Google Calendar Event Creator", layout, background_color=background_color
+)
+
 
 # Event loop
 while True:
     event, values = window.read()
 
-    if event in (None, "Cancel"):
+    if event in (None, "Close"):
         break
+    elif event == "Clear":
+        # This will clear all input fields
+        for key in values:
+            if key in ["title", "event_date", "description"]:
+                window[key]("")
     elif event == "Submit":
         if values["event_date"]:
             service = authenticate_google()
