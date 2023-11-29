@@ -101,16 +101,16 @@ def find_free_time(service, date, duration_str):
 
 
 # Function to create an event in Google Calendar
-def create_event(service, title, start_datetime, end_datetime, description, color_id=8):
+def create_event(
+    service, title, start_datetime, end_datetime, description, color_id="0"
+):
     event = {
         "summary": title,
         "description": description,
         "start": {"dateTime": start_datetime, "timeZone": "Europe/Madrid"},
         "end": {"dateTime": end_datetime, "timeZone": "Europe/Madrid"},
+        "colorId": color_id,  # Set the color of the event
     }
-
-    if color_id:
-        event["colorId"] = color_id
 
     event = service.events().insert(calendarId="primary", body=event).execute()
     return event.get("htmlLink")
@@ -129,6 +129,23 @@ button_font = ("Any", 12, "bold")
 input_font = ("Any", 12)
 button_color = ("black", "gold")
 background_color = "lightgrey"
+
+# Google Calendar color IDs and their descriptions
+color_choices = {
+    "Blue": "0",
+    "Lavender": "1",
+    "Green": "2",
+    "Violet": "3",
+    "Pink": "4",
+    "Yellow": "5",
+    "Orange": "6",
+    "Highlight Blue": "7",
+    "Grey": "8",
+    "Dark Blue": "9",
+    "Dark Green": "10",
+    "Red": "11",
+}
+
 
 # Define the layout with style enhancements
 layout = [
@@ -169,6 +186,13 @@ layout = [
                         default_value="30 minutes",
                         key="duration",
                         font=input_font,
+                    ),
+                    sg.Text("Event Color", font=label_font),
+                    sg.Combo(
+                        list(color_choices.keys()),
+                        default_value="Default",
+                        font=input_font,
+                        key="event_color",
                     ),
                 ],
             ],
@@ -227,12 +251,14 @@ while True:
                     end_datetime = start_datetime + datetime.timedelta(hours=2)
                 end_datetime_str = end_datetime.isoformat()
 
+                selected_color = color_choices[values["event_color"]]
                 event_link = create_event(
                     service,
                     values["title"],
                     start_datetime_str,
                     end_datetime_str,
                     values["description"],
+                    color_id=selected_color,
                 )
                 sg.popup(f"Event created: {event_link}")
             else:
