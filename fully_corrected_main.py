@@ -16,12 +16,16 @@ def authenticate_google():
 
 def find_free_time(service, date, duration_str):
     # Parse the duration string
-    if duration_str == "15 minutes":
+    if duration_str == "10 minutes":
+        duration = datetime.timedelta(minutes=10)
+    elif duration_str == "15 minutes":
         duration = datetime.timedelta(minutes=15)
     elif duration_str == "30 minutes":
         duration = datetime.timedelta(minutes=30)
-    else:  # '1 hour'
+    elif duration_str == "1 hour":
         duration = datetime.timedelta(hours=1)
+    elif duration_str == "2 hours":  # New case for 2 hours
+        duration = datetime.timedelta(hours=2)
 
     timezone = pytz.timezone("Europe/Madrid")
     start_date = datetime.datetime.strptime(date, "%Y-%m-%d").replace(tzinfo=timezone)
@@ -96,7 +100,7 @@ sg.theme("BrightColors")
 # sg.theme("Topanga")
 
 # Duration choices
-duration_choices = ["15 minutes", "30 minutes", "1 hour"]
+duration_choices = ["10 minutes", "15 minutes", "30 minutes", "1 hour", "2 hours"]
 
 # Font and color configurations
 title_font = ("Any", 14, "bold")
@@ -191,12 +195,16 @@ while True:
                 # Automatically choose the first available slot
                 start_datetime_str = free_time_slots[0]
                 start_datetime = datetime.datetime.fromisoformat(start_datetime_str)
-                if duration == "15 minutes":
+                if duration == "10 minutes":
+                    end_datetime = start_datetime + datetime.timedelta(minutes=10)
+                elif duration == "15 minutes":
                     end_datetime = start_datetime + datetime.timedelta(minutes=15)
                 elif duration == "30 minutes":
                     end_datetime = start_datetime + datetime.timedelta(minutes=30)
-                else:  # '1 hour'
+                elif duration == "1 hour":
                     end_datetime = start_datetime + datetime.timedelta(hours=1)
+                elif duration == "2 hours":
+                    end_datetime = start_datetime + datetime.timedelta(hours=2)
                 end_datetime_str = end_datetime.isoformat()
 
                 event_link = create_event(
