@@ -100,6 +100,41 @@ def find_free_time(service, date, duration_str):
     return free_slots
 
 
+def get_events_for_date(service, date):
+    start_date = datetime.datetime.strptime(date, "%Y-%m-%d").replace(
+        tzinfo=pytz.timezone("Europe/Madrid")
+    )
+    end_date = start_date + datetime.timedelta(days=1)
+
+    events_result = (
+        service.events()
+        .list(
+            calendarId="primary",
+            timeMin=start_date.isoformat(),
+            timeMax=end_date.isoformat(),
+            singleEvents=True,
+            orderBy="startTime",
+        )
+        .execute()
+    )
+    events = events_result.get("items", [])
+
+    formatted_events = []
+    for event in events:
+        start_time = event["start"].get("dateTime", event["start"].get("date"))
+        try:
+            # Extract only the time part if it's a dateTime object
+            start_time = datetime.datetime.fromisoformat(start_time).strftime("%H:%M")
+        except ValueError:
+            # Keep the full date if it's a date object (all-day event)
+            start_time = datetime.datetime.fromisoformat(start_time).strftime(
+                "%Y-%m-%d"
+            )
+        formatted_events.append(f"{start_time} - {event['summary']}")
+
+    return formatted_events
+
+
 # Function to create an event in Google Calendar
 def create_event(
     service, title, start_datetime, end_datetime, description, color_id="0"
@@ -178,6 +213,12 @@ layout = [
                 [
                     sg.Text("Description", font=label_font),
                     sg.InputText(key="description", font=input_font),
+                    sg.Button(
+                        "Show Events",
+                        key="Show_Events",
+                        font=button_font,
+                        button_color=button_color,
+                    ),
                 ],
                 [
                     sg.Text("Event Duration", font=label_font),
@@ -224,6 +265,17 @@ while True:
 
     if event in (None, "Close"):
         break
+    elif event == "Show_Events":
+        if values["event_date"]:
+            service = authenticate_google()
+            events_list = get_events_for_date(service, values["event_date"])
+            sg.popup_scrolled(
+                "Events on " + values["event_date"],
+                "\n".join(events_list),
+                size=(40, 10),
+            )
+        else:
+            sg.popup("Please select a date first")
     elif event == "Clear":
         # This will clear all input fields
         for key in values:
