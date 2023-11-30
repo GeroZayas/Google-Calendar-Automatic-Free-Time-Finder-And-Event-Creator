@@ -53,16 +53,14 @@ def find_free_time(service, date, duration_str):
     # Get current time with timezone
     current_time = datetime.datetime.now(pytz.timezone("Europe/Madrid"))
 
-    # Check if the start_date is today and before the current time
-    if start_date.date() == current_time.date() and start_date < current_time:
-        # If it's the same day but the time has already passed, start from the current time
-        start_date = current_time
-
-    end_date = start_date + datetime.timedelta(days=1)
-
     # Define the start and end times for the search window (7 AM to 11 PM)
-    search_start_time = start_date.replace(hour=7, minute=0, second=0)
-    search_end_time = start_date.replace(hour=23, minute=0, second=0)
+    search_start_time = start_date.replace(hour=7, minute=0, second=0, microsecond=0)
+    search_end_time = start_date.replace(hour=23, minute=0, second=0, microsecond=0)
+
+    # If the start_date is today and it's already past the search window start time, update search_start_time to the current time
+    if start_date.date() == current_time.date() and search_start_time < current_time:
+        search_start_time = current_time
+    end_date = start_date + datetime.timedelta(days=1)
 
     body = {
         "timeMin": search_start_time.isoformat(),
