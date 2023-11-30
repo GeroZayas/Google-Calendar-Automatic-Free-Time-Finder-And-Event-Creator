@@ -272,7 +272,8 @@ while True:
             sg.popup_scrolled(
                 "Events on " + values["event_date"],
                 "\n".join(events_list),
-                size=(40, 10),
+                font=input_font,
+                size=(80, 20),
             )
         else:
             sg.popup("Please select a date first")
