@@ -190,7 +190,7 @@ layout = [
                     sg.Text("Event Color", font=label_font),
                     sg.Combo(
                         list(color_choices.keys()),
-                        default_value="Default",
+                        default_value="Red",
                         font=input_font,
                         key="event_color",
                     ),
