@@ -111,7 +111,11 @@ def custom_popup(title, events_list):
                 select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED,
             )
         ],
-        [sg.Button("Copy to Clipboard"), sg.Button("Close")],
+        [
+            sg.Button("Copy to Clipboard"),
+            sg.Button("Download to File"),
+            sg.Button("Close"),
+        ],
     ]
 
     window = sg.Window(title, layout)
@@ -120,6 +124,19 @@ def custom_popup(title, events_list):
         event, values = window.read()
         if event in (sg.WIN_CLOSED, "Close"):
             break
+        elif event == "Download to File":
+            if file_path := sg.popup_get_file(
+                "Save As",
+                save_as=True,
+                no_window=True,
+                file_types=(("Text Files", "*.txt"),),
+                default_extension=".txt",
+            ):
+                with open(file_path, "w") as file:
+                    file.write("\n".join(events_list))
+                sg.popup(
+                    "Events saved to file!", auto_close=True, auto_close_duration=1
+                )
         elif event == "Copy to Clipboard":
             # Check if any event is selected, if not, copy all events
             selected_events = values["-LIST-"] or events_list
@@ -316,6 +333,7 @@ while True:
             service = authenticate_google()
             events_list = get_events_for_date(service, values["event_date"])
             custom_popup("Events on " + values["event_date"], events_list)
+
         else:
             sg.popup("Please select a date first")
 
