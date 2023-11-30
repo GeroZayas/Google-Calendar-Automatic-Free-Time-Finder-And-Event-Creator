@@ -100,6 +100,38 @@ def find_free_time(service, date, duration_str):
     return free_slots
 
 
+def custom_popup(title, events_list):
+    layout = [
+        [
+            sg.Listbox(
+                events_list,
+                font=input_font,
+                size=(80, 20),
+                key="-LIST-",
+                select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED,
+            )
+        ],
+        [sg.Button("Copy to Clipboard"), sg.Button("Close")],
+    ]
+
+    window = sg.Window(title, layout)
+
+    while True:
+        event, values = window.read()
+        if event in (sg.WIN_CLOSED, "Close"):
+            break
+        elif event == "Copy to Clipboard":
+            # Check if any event is selected, if not, copy all events
+            selected_events = values["-LIST-"] or events_list
+            clipboard_content = "\n".join(selected_events)
+            sg.clipboard_set(clipboard_content)
+            sg.popup(
+                "Content copied to clipboard!", auto_close=True, auto_close_duration=1
+            )
+
+    window.close()
+
+
 def get_events_for_date(service, date):
     start_date = datetime.datetime.strptime(date, "%Y-%m-%d").replace(
         tzinfo=pytz.timezone("Europe/Madrid")
@@ -265,18 +297,28 @@ while True:
 
     if event in (None, "Close"):
         break
+
+    # elif event == "Show_Events":
+    #     if values["event_date"]:
+    #         service = authenticate_google()
+    #         events_list = get_events_for_date(service, values["event_date"])
+    #         sg.popup_scrolled(
+    #             "Events on " + values["event_date"],
+    #             "\n".join(events_list),
+    #             font=input_font,
+    #             size=(80, 20),
+    #         )
+    #     else:
+    #         sg.popup("Please select a date first")
+
     elif event == "Show_Events":
         if values["event_date"]:
             service = authenticate_google()
             events_list = get_events_for_date(service, values["event_date"])
-            sg.popup_scrolled(
-                "Events on " + values["event_date"],
-                "\n".join(events_list),
-                font=input_font,
-                size=(80, 20),
-            )
+            custom_popup("Events on " + values["event_date"], events_list)
         else:
             sg.popup("Please select a date first")
+
     elif event == "Clear":
         # This will clear all input fields
         for key in values:
