@@ -8,6 +8,13 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 import os
 
+# Specify the absolute path to the Tcl library
+tcl_library_path = "/usr/lib/tcl8.6"
+
+# Set the TCL_LIBRARY environment variable within the script
+os.environ["TCL_LIBRARY"] = tcl_library_path
+
+
 # Function to authenticate and create a service object
 def authenticate_google():
     creds = None
@@ -128,10 +135,14 @@ def custom_popup(title, events_list):
                 file.write("\n".join(events_list))
             messagebox.showinfo("Download to File", "Events saved to file!")
 
-    copy_button = tk.Button(popup_window, text="Copy to Clipboard", command=copy_to_clipboard)
+    copy_button = tk.Button(
+        popup_window, text="Copy to Clipboard", command=copy_to_clipboard
+    )
     copy_button.pack()
 
-    download_button = tk.Button(popup_window, text="Download to File", command=download_to_file)
+    download_button = tk.Button(
+        popup_window, text="Download to File", command=download_to_file
+    )
     download_button.pack()
 
     close_button = tk.Button(popup_window, text="Close", command=popup_window.destroy)
