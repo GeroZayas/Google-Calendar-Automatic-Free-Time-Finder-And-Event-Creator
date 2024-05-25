@@ -14,7 +14,6 @@ tcl_library_path = "/usr/lib/tcl8.6"
 # Set the TCL_LIBRARY environment variable within the script
 os.environ["TCL_LIBRARY"] = tcl_library_path
 
-
 # Function to authenticate and create a service object
 def authenticate_google():
     creds = None
@@ -200,10 +199,11 @@ def create_event(
     return event.get("htmlLink")
 
 
-# Main Tkinter window
-root = tk.Tk()
-root.title("Google Calendar Event Creator")
+if __name__ == '__main__':
+    service = authenticate_google()
+    root = tk.Tk()
+    root.title("Google Calendar Event Creator")
 
-# Rest of the code for the Tkinter GUI layout and event handling will go here
+    # Rest of the code for the Tkinter GUI layout and event handling will go here
 
-root.mainloop()
+    root.mainloop()
