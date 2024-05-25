@@ -2,18 +2,17 @@ import tkinter as tk
 from tkinter import messagebox, simpledialog, filedialog
 import datetime
 import pytz
+from google.auth.transport.requests import Request
+from google.oauth2 import credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 import os
-import google.oauth2.credentials
-from google.auth.transport.requests import Request
-
 
 # Function to authenticate and create a service object
 def authenticate_google():
     creds = None
     if os.path.exists("token.json"):
-        creds = google.oauth2.credentials.Credentials.from_authorized_user_file(
+        creds = credentials.Credentials.from_authorized_user_file(
             "token.json", scopes=["https://www.googleapis.com/auth/calendar"]
         )
 
