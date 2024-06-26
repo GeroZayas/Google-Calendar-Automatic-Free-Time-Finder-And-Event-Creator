@@ -8,6 +8,13 @@ import google.oauth2.credentials
 from google.auth.transport.requests import Request
 
 
+# ===========================================================================
+# ===========================================================================
+# FUNCTIONS
+# ===========================================================================
+# ===========================================================================
+
+
 # Function to authenticate and create a service object
 def authenticate_google():
     creds = None
@@ -184,45 +191,54 @@ def modify_event(service, event_id, new_title, new_color_id, new_duration):
     return updated_event.get("htmlLink")
 
 
-st.title("Google Calendar Event Creator")
+# ===========================================================================
+# ===========================================================================
+# ===========================================================================
+# ===========================================================================
 
-event_title = st.text_input("Event Title")
-event_date = st.date_input("Event Date")
-description = st.text_area("Description")
+st.title("📅 Google Calendar Event Creator")
+st.subheader(
+    "Effortlessly schedule your tasks without the hassle—let our app find your free time in Google Calendar!"
+)
+
+event_title = st.text_input("📝 Event Title")
+event_date = st.date_input("📅 Event Date")
+description = st.text_area("📝 Description")
 duration = st.selectbox(
-    "Event Duration", ["10 minutes", "15 minutes", "30 minutes", "1 hour", "2 hours"]
+    "⏱️ Event Duration", ["10 minutes", "15 minutes", "30 minutes", "1 hour", "2 hours"]
 )
 color = st.selectbox(
-    "Event Color",
+    "🎨 Event Color",
     [
-        "Blue",
-        "Lavender",
-        "Green",
-        "Violet",
-        "Pink",
-        "Yellow",
-        "Orange",
-        "Highlight Blue",
-        "Grey",
-        "Dark Blue",
-        "Dark Green",
-        "Red",
+        "🔵 Blue",
+        "💜 Lavender",
+        "🟢 Green",
+        "🟣 Violet",
+        "💖 Pink",
+        "💛 Yellow",
+        "🟠 Orange",
+        "🔹 Highlight Blue",
+        "⚪ Grey",
+        "🔷 Dark Blue",
+        "🟢 Dark Green",
+        "🔴 Red",
     ],
 )
 
-if st.button("Show Events"):
+
+if st.button("📅 Show Events"):
     if event_date:
         service = authenticate_google()
         events_list, event_mapping = get_events_for_date(
             service, event_date.strftime("%Y-%m-%d")
         )
-        st.write(f"Events on {event_date}")
+        st.write(f"🗓️ Events on {event_date}")
         st.write("\n\n".join(events_list))
         st.session_state.event_mapping = (
             event_mapping  # Store the mapping in session state
         )
     else:
-        st.error("Please select a date first")
+        st.error("❌ Please select a date first")
 
 
 if st.button("📅 Create Event"):
