@@ -272,5 +272,58 @@ if st.button("Delete Event"):
     else:
         st.error("Please enter an event ID to delete")
 
+event_id_to_modify = st.text_input("Event ID to Modify")
+new_title = st.text_input("New Event Title")
+new_description = st.text_area("New Description")
+new_start_datetime = st.text_input("New Start Datetime (YYYY-MM-DDTHH:MM:SS)")
+new_end_datetime = st.text_input("New End Datetime (YYYY-MM-DDTHH:MM:SS)")
+new_color = st.selectbox(
+    "New Event Color",
+    [
+        "Blue",
+        "Lavender",
+        "Green",
+        "Violet",
+        "Pink",
+        "Yellow",
+        "Orange",
+        "Highlight Blue",
+        "Grey",
+        "Dark Blue",
+        "Dark Green",
+        "Red",
+    ],
+)
+
+if st.button("Modify Event"):
+    if event_id_to_modify and new_start_datetime and new_end_datetime:
+        service = authenticate_google()
+        new_color_id = {
+            "Blue": "0",
+            "Lavender": "1",
+            "Green": "2",
+            "Violet": "3",
+            "Pink": "4",
+            "Yellow": "5",
+            "Orange": "6",
+            "Highlight Blue": "7",
+            "Grey": "8",
+            "Dark Blue": "9",
+            "Dark Green": "10",
+            "Red": "11",
+        }[new_color]
+        event_link = modify_event(
+            service,
+            event_id_to_modify,
+            new_title,
+            new_description,
+            new_start_datetime,
+            new_end_datetime,
+            new_color_id,
+        )
+        st.success(f"Event modified: [Event Link]({event_link})")
+    else:
+        st.error("Please enter all required fields to modify the event")
+
 if st.button("Clear"):
     st.experimental_rerun()
