@@ -1,2 +1,0 @@
-FIX -> make sure it finds a free slot the same day but after current time (CHECK THIS ONE TOMORROW (30 nov 2023))
-
