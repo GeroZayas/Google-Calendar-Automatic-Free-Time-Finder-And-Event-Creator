@@ -3,3 +3,6 @@ Google calendar python.txt
 token.json
 .aider*
 .venv/
+google_calendar_event_creator_tkinter.py
+google_calendar_event_creator.py
+
