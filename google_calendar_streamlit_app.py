@@ -198,8 +198,9 @@ def modify_event(service, event_id, new_title, new_color_id, new_duration):
 
 st.title("📅 Google Calendar Event Creator")
 st.subheader(
-    "Effortlessly schedule your tasks without the hassle—let our app find your free time in Google Calendar!"
+    "🌟 Effortlessly schedule your tasks without the hassle — let our app find your free time in Google Calendar! ⏰"
 )
+
 
 event_title = st.text_input("📝 Event Title")
 event_date = st.date_input("📅 Event Date")
