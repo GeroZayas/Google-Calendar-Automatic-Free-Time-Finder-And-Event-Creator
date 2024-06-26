@@ -2,6 +2,10 @@
 
 Welcome to the Google Calendar Event Creator by Gero Zayas! This application allows you to seamlessly manage and schedule events in your Google Calendar directly from your browser.
 
+## 📸 Screeshot
+
+ <img src="./assets/App-Screenshot.png" alt="App screenshot" width="500">
+
 ## 🚀 Features
 
 - **Automatic Scheduling:** Find available time slots effortlessly.
