@@ -119,7 +119,8 @@ def get_events_for_date(service, date):
     events = events_result.get("items", [])
 
     formatted_events = []
-    for event in events:
+    event_mapping = {}
+    for i, event in enumerate(events, start=1):
         event_id = event["id"]
         start_time = event["start"].get("dateTime", event["start"].get("date"))
         try:
@@ -128,9 +129,10 @@ def get_events_for_date(service, date):
             start_time = datetime.datetime.fromisoformat(start_time).strftime(
                 "%Y-%m-%d"
             )
-        formatted_events.append(f"ID: {event_id} | {start_time} - {event['summary']}")
+        formatted_events.append(f"{i}. {start_time} - {event['summary']}")
+        event_mapping[i] = event_id
 
-    return formatted_events
+    return formatted_events, event_mapping
 
 
 # Function to create an event in Google Calendar
@@ -153,22 +155,26 @@ def delete_event(service, event_id):
     service.events().delete(calendarId="primary", eventId=event_id).execute()
 
 
-def modify_event(
-    service,
-    event_id,
-    new_title,
-    new_description,
-    new_start_datetime,
-    new_end_datetime,
-    new_color_id="0",
-):
+def modify_event(service, event_id, new_title, new_color_id, new_duration):
     event = service.events().get(calendarId="primary", eventId=event_id).execute()
 
     event["summary"] = new_title
-    event["description"] = new_description
-    event["start"] = {"dateTime": new_start_datetime, "timeZone": "Europe/Madrid"}
-    event["end"] = {"dateTime": new_end_datetime, "timeZone": "Europe/Madrid"}
     event["colorId"] = new_color_id
+
+    # Calculate new end time based on new duration
+    start_time = datetime.datetime.fromisoformat(event["start"]["dateTime"])
+    if new_duration == "10 minutes":
+        end_time = start_time + datetime.timedelta(minutes=10)
+    elif new_duration == "15 minutes":
+        end_time = start_time + datetime.timedelta(minutes=15)
+    elif new_duration == "30 minutes":
+        end_time = start_time + datetime.timedelta(minutes=30)
+    elif new_duration == "1 hour":
+        end_time = start_time + datetime.timedelta(hours=1)
+    elif new_duration == "2 hours":
+        end_time = start_time + datetime.timedelta(hours=2)
+
+    event["end"]["dateTime"] = end_time.isoformat()
 
     updated_event = (
         service.events()
@@ -207,11 +213,17 @@ color = st.selectbox(
 if st.button("Show Events"):
     if event_date:
         service = authenticate_google()
-        events_list = get_events_for_date(service, event_date.strftime("%Y-%m-%d"))
+        events_list, event_mapping = get_events_for_date(
+            service, event_date.strftime("%Y-%m-%d")
+        )
         st.write(f"Events on {event_date}")
         st.write("\n\n".join(events_list))
+        st.session_state.event_mapping = (
+            event_mapping  # Store the mapping in session state
+        )
     else:
         st.error("Please select a date first")
+
 
 if st.button("Create Event"):
     if event_date:
@@ -262,68 +274,75 @@ if st.button("Create Event"):
     else:
         st.error("Please select a date")
 
-with st.expander("Delete Event"):
-    event_id_to_delete = st.text_input("Event ID to Delete")
-    if st.button("Delete Event"):
-        if event_id_to_delete:
+with st.expander("🗑️ Delete Event"):
+    event_number_to_delete = st.number_input(
+        "🔢 Event Number to Delete", min_value=1, step=1
+    )
+    if st.button("🗑️ Delete Event"):
+        if (
+            "event_mapping" in st.session_state
+            and event_number_to_delete in st.session_state.event_mapping
+        ):
+            event_id_to_delete = st.session_state.event_mapping[event_number_to_delete]
             service = authenticate_google()
             delete_event(service, event_id_to_delete)
-            st.success(f"Event with ID {event_id_to_delete} deleted successfully")
+            st.success(f"✅ Event with ID {event_id_to_delete} deleted successfully")
         else:
-            st.error("Please enter an event ID to delete")
+            st.error("❌ Invalid event number")
 
-with st.expander("Modify Event"):
-    event_id_to_modify = st.text_input("Event ID to Modify")
-    new_title = st.text_input("New Event Title")
-    new_description = st.text_area("New Description")
-    new_start_datetime = st.text_input("New Start Datetime (YYYY-MM-DDTHH:MM:SS)")
-    new_end_datetime = st.text_input("New End Datetime (YYYY-MM-DDTHH:MM:SS)")
+with st.expander("🛠️ Modify Event"):
+    event_number_to_modify = st.number_input(
+        "🔢 Event Number to Modify", min_value=1, step=1
+    )
+    new_title = st.text_input("📝 New Event Title")
+    new_duration = st.selectbox(
+        "⏱️ New Event Duration",
+        ["10 minutes", "15 minutes", "30 minutes", "1 hour", "2 hours"],
+    )
     new_color = st.selectbox(
-        "New Event Color",
+        "🎨 New Event Color",
         [
-            "Blue",
-            "Lavender",
-            "Green",
-            "Violet",
-            "Pink",
-            "Yellow",
-            "Orange",
-            "Highlight Blue",
-            "Grey",
-            "Dark Blue",
-            "Dark Green",
-            "Red",
+            "🔵 Blue",
+            "💜 Lavender",
+            "🟢 Green",
+            "🟣 Violet",
+            "💖 Pink",
+            "💛 Yellow",
+            "🟠 Orange",
+            "🔹 Highlight Blue",
+            "⚪ Grey",
+            "🔷 Dark Blue",
+            "🟢 Dark Green",
+            "🔴 Red",
         ],
     )
-    if st.button("Modify Event"):
-        if event_id_to_modify and new_start_datetime and new_end_datetime:
+    if st.button("💾 Modify Event"):
+        if (
+            "event_mapping" in st.session_state
+            and event_number_to_modify in st.session_state.event_mapping
+        ):
+            event_id_to_modify = st.session_state.event_mapping[event_number_to_modify]
             service = authenticate_google()
             new_color_id = {
-                "Blue": "0",
-                "Lavender": "1",
-                "Green": "2",
-                "Violet": "3",
-                "Pink": "4",
-                "Yellow": "5",
-                "Orange": "6",
-                "Highlight Blue": "7",
-                "Grey": "8",
-                "Dark Blue": "9",
-                "Dark Green": "10",
-                "Red": "11",
+                "🔵 Blue": "0",
+                "💜 Lavender": "1",
+                "🟢 Green": "2",
+                "🟣 Violet": "3",
+                "💖 Pink": "4",
+                "💛 Yellow": "5",
+                "🟠 Orange": "6",
+                "🔹 Highlight Blue": "7",
+                "⚪ Grey": "8",
+                "🔷 Dark Blue": "9",
+                "🟢 Dark Green": "10",
+                "🔴 Red": "11",
             }[new_color]
             event_link = modify_event(
-                service,
-                event_id_to_modify,
-                new_title,
-                new_description,
-                new_start_datetime,
-                new_end_datetime,
-                new_color_id,
+                service, event_id_to_modify, new_title, new_color_id, new_duration
             )
-            st.success(f"Event modified: [Event Link]({event_link})")
+            st.success(f"✅ Event modified: [Event Link]({event_link})")
         else:
-            st.error("Please enter all required fields to modify the event")
+            st.error("❌ Invalid event number or missing required fields")
 
 if st.button("Clear"):
     st.experimental_rerun()
