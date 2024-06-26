@@ -238,5 +238,14 @@ if st.button("Create Event"):
     else:
         st.error("Please select a date")
 
+event_id_to_delete = st.text_input("Event ID to Delete")
+if st.button("Delete Event"):
+    if event_id_to_delete:
+        service = authenticate_google()
+        delete_event(service, event_id_to_delete)
+        st.success(f"Event with ID {event_id_to_delete} deleted successfully")
+    else:
+        st.error("Please enter an event ID to delete")
+
 if st.button("Clear"):
     st.experimental_rerun()
