@@ -154,6 +154,31 @@ def delete_event(service, event_id):
     service.events().delete(calendarId="primary", eventId=event_id).execute()
 
 
+def modify_event(
+    service,
+    event_id,
+    new_title,
+    new_description,
+    new_start_datetime,
+    new_end_datetime,
+    new_color_id="0",
+):
+    event = service.events().get(calendarId="primary", eventId=event_id).execute()
+
+    event["summary"] = new_title
+    event["description"] = new_description
+    event["start"] = {"dateTime": new_start_datetime, "timeZone": "Europe/Madrid"}
+    event["end"] = {"dateTime": new_end_datetime, "timeZone": "Europe/Madrid"}
+    event["colorId"] = new_color_id
+
+    updated_event = (
+        service.events()
+        .update(calendarId="primary", eventId=event_id, body=event)
+        .execute()
+    )
+    return updated_event.get("htmlLink")
+
+
 st.title("Google Calendar Event Creator")
 
 event_title = st.text_input("Event Title")
