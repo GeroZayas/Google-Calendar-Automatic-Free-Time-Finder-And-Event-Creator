@@ -225,7 +225,7 @@ if st.button("Show Events"):
         st.error("Please select a date first")
 
 
-if st.button("Create Event"):
+if st.button("📅 Create Event"):
     if event_date:
         service = authenticate_google()
         if free_time_slots := find_free_time(
@@ -246,18 +246,18 @@ if st.button("Create Event"):
             end_datetime_str = end_datetime.isoformat()
 
             color_id = {
-                "Blue": "0",
-                "Lavender": "1",
-                "Green": "2",
-                "Violet": "3",
-                "Pink": "4",
-                "Yellow": "5",
-                "Orange": "6",
-                "Highlight Blue": "7",
-                "Grey": "8",
-                "Dark Blue": "9",
-                "Dark Green": "10",
-                "Red": "11",
+                "🔵 Blue": "0",
+                "💜 Lavender": "1",
+                "🟢 Green": "2",
+                "🟣 Violet": "3",
+                "💖 Pink": "4",
+                "💛 Yellow": "5",
+                "🟠 Orange": "6",
+                "🔹 Highlight Blue": "7",
+                "⚪ Grey": "8",
+                "🔷 Dark Blue": "9",
+                "🟢 Dark Green": "10",
+                "🔴 Red": "11",
             }[color]
 
             event_link = create_event(
@@ -268,11 +268,11 @@ if st.button("Create Event"):
                 description,
                 color_id=color_id,
             )
-            st.success(f"Event created: [Event Link]({event_link})")
+            st.success(f"✅ Event created: [Event Link]({event_link})")
         else:
-            st.error("No free time slots available on this date")
+            st.error("❌ No free time slots available on this date")
     else:
-        st.error("Please select a date")
+        st.error("❌ Please select a date")
 
 with st.expander("🗑️ Delete Event"):
     event_number_to_delete = st.number_input(
