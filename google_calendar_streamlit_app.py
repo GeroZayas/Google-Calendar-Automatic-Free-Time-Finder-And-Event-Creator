@@ -68,7 +68,7 @@ def find_free_time(service, date, duration_str):
     # If the start_date is today and it's already past the search window start time, update search_start_time to the current time
     if start_date.date() == current_time.date() and search_start_time < current_time:
         search_start_time = current_time
-    end_date = start_date + datetime.timedelta(days=1)
+    # end_date = start_date + datetime.timedelta(days=1)
 
     body = {
         "timeMin": search_start_time.isoformat(),
