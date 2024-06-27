@@ -1,7 +1,7 @@
 import streamlit as st
 import datetime
 import pytz
-from google_auth_oauthlib.flow import InstalledAppFlow
+from google_auth_oauthlib.flow import InstalledAppFlow  # type: ignore
 from googleapiclient.discovery import build
 import os
 import google.oauth2.credentials
