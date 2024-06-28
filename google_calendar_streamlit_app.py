@@ -1,45 +1,57 @@
 import streamlit as st
 import datetime
 import pytz
-from google_auth_oauthlib.flow import InstalledAppFlow  # type: ignore
+from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 import os
 import google.oauth2.credentials
 from google.auth.transport.requests import Request
 
 
-# ===========================================================================
-# ===========================================================================
-# FUNCTIONS
-# ===========================================================================
-# ===========================================================================
-
-
 # Function to authenticate and create a service object
 def authenticate_google():
     creds = None
+
+    # Check if token.json exists and load credentials from it
     if os.path.exists("token.json"):
-        creds = google.oauth2.credentials.Credentials.from_authorized_user_file(
-            "token.json", scopes=["https://www.googleapis.com/auth/calendar"]
+        try:
+            creds = google.oauth2.credentials.Credentials.from_authorized_user_file(
+                "token.json", scopes=["https://www.googleapis.com/auth/calendar"]
+            )
+        except Exception as e:
+            st.error(f"Error loading credentials from token.json: {e}")
+
+    # If credentials are missing or invalid, assist the user in obtaining them
+    if not creds or not creds.valid:
+        st.warning(
+            "No valid credentials found. Please ensure you have 'credentials.json'."
         )
 
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            # Delete the token.json file if it exists
+        try:
+            # Delete the token.json file if it exists (to start fresh)
             if os.path.exists("token.json"):
                 os.remove("token.json")
 
+            # Start the OAuth flow to obtain new credentials
             flow = InstalledAppFlow.from_client_secrets_file(
                 "credentials.json", scopes=["https://www.googleapis.com/auth/calendar"]
             )
             creds = flow.run_local_server(port=0)
 
-        with open("token.json", "w") as token:
-            token.write(creds.to_json())
+            # Save the obtained credentials to token.json for future use
+            with open("token.json", "w") as token:
+                token.write(creds.to_json())
 
-    return build("calendar", "v3", credentials=creds)
+        except Exception as e:
+            st.error(f"Error obtaining credentials: {e}")
+
+    # Return the Google Calendar service object using the obtained credentials
+    try:
+        service = build("calendar", "v3", credentials=creds)
+        return service
+    except Exception as e:
+        st.error(f"Error creating Google Calendar service: {e}")
+        return None
 
 
 def find_free_time(service, date, duration_str):
