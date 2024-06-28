@@ -8,6 +8,9 @@ import google.oauth2.credentials
 from google.auth.transport.requests import Request
 
 
+# ===========================================================================
+# =====================FUNCTIONS=============================================
+# ===========================================================================
 # Function to authenticate and create a service object
 def authenticate_google():
     creds = None
@@ -204,16 +207,19 @@ def modify_event(service, event_id, new_title, new_color_id, new_duration):
 
 
 # ===========================================================================
-# ===========================================================================
-# ===========================================================================
+# =====================APP ELEMENTS AND LAYOUT===============================
 # ===========================================================================
 
+
+# TITLE AND SUBHEADER
+# ===========================================================================
 st.title("📅 Google Calendar Event Creator")
 st.subheader(
     "🌟 Effortlessly schedule your tasks without the hassle — let our app find your free time in Google Calendar! ⏰"
 )
 
-
+# LAYOUT ELEMENTS INPUTS
+# ===========================================================================
 event_title = st.text_input("📝 Event Title")
 event_date = st.date_input("📅 Event Date")
 description = st.text_area("📝 Description")
@@ -238,7 +244,8 @@ color = st.selectbox(
     ],
 )
 
-
+# BUTTONS, FUNCTIONALITY
+# ===========================================================================
 if st.button("📅 Show Events"):
     if event_date:
         service = authenticate_google()
@@ -303,6 +310,8 @@ if st.button("📅 Create Event"):
     else:
         st.error("❌ Please select a date")
 
+# EXTRA OPTIONS, DELETE AND MODIFY
+# ===========================================================================
 with st.expander("🗑️ Delete Event"):
     event_number_to_delete = st.number_input(
         "🔢 Event Number to Delete", min_value=1, step=1
@@ -373,5 +382,7 @@ with st.expander("🛠️ Modify Event"):
         else:
             st.error("❌ Invalid event number or missing required fields")
 
+# CLEAR BUTTON
+# ===========================================================================
 if st.button("Clear"):
     st.experimental_rerun()
