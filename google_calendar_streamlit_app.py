@@ -16,10 +16,11 @@ def authenticate_google():
     creds = None
 
     # Check if token.json exists and load credentials from it
-    if os.path.exists("token.json"):
+    if os.path.exists("./credentials/token.json"):
         try:
             creds = google.oauth2.credentials.Credentials.from_authorized_user_file(
-                "token.json", scopes=["https://www.googleapis.com/auth/calendar"]
+                "./credentials/token.json",
+                scopes=["https://www.googleapis.com/auth/calendar"],
             )
         except Exception as e:
             st.error(f"Error loading credentials from token.json: {e}")
@@ -32,17 +33,18 @@ def authenticate_google():
 
         try:
             # Delete the token.json file if it exists (to start fresh)
-            if os.path.exists("token.json"):
-                os.remove("token.json")
+            if os.path.exists("./credentials/token.json"):
+                os.remove("./credentials/token.json")
 
             # Start the OAuth flow to obtain new credentials
             flow = InstalledAppFlow.from_client_secrets_file(
-                "credentials.json", scopes=["https://www.googleapis.com/auth/calendar"]
+                "./credentials/credentials.json",
+                scopes=["https://www.googleapis.com/auth/calendar"],
             )
             creds = flow.run_local_server(port=0)
 
             # Save the obtained credentials to token.json for future use
-            with open("token.json", "w") as token:
+            with open("./credentials/token.json", "w") as token:
                 token.write(creds.to_json())
 
         except Exception as e:
@@ -215,7 +217,13 @@ def modify_event(service, event_id, new_title, new_color_id, new_duration):
 # ===========================================================================
 # =====================APP ELEMENTS AND LAYOUT===============================
 # ===========================================================================
-
+st.set_page_config(
+    page_title="Google Calendar Automatic Event Creator",
+    page_icon="./assets/calendar-ico.webp",
+    layout="centered",
+    initial_sidebar_state="auto",
+    menu_items=None,
+)
 
 # TITLE AND SUBHEADER
 # ===========================================================================
