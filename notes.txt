@@ -1,0 +1,7 @@
+- Add options 5min, 45min, 1.30 h tasks ✅
+
+- Add button that opens official google page / calendar of user
+
+
+
+

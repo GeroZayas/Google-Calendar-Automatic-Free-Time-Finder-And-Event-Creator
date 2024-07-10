@@ -63,10 +63,16 @@ def find_free_time(service, date, duration_str):
         duration = datetime.timedelta(minutes=10)
     elif duration_str == "15 minutes":
         duration = datetime.timedelta(minutes=15)
+    elif duration_str == "5 minutes":
+        duration = datetime.timedelta(minutes=5)
     elif duration_str == "30 minutes":
         duration = datetime.timedelta(minutes=30)
+    elif duration_str == "45 minutes":
+        duration = datetime.timedelta(minutes=45)
     elif duration_str == "1 hour":
         duration = datetime.timedelta(hours=1)
+    elif duration_str == "1:30 hour":
+        duration = datetime.timedelta(minutes=90)
     elif duration_str == "2 hours":
         duration = datetime.timedelta(hours=2)
 
@@ -224,7 +230,17 @@ event_title = st.text_input("📝 Event Title")
 event_date = st.date_input("📅 Event Date")
 description = st.text_area("📝 Description")
 duration = st.selectbox(
-    "⏱️ Event Duration", ["10 minutes", "15 minutes", "30 minutes", "1 hour", "2 hours"]
+    "⏱️ Event Duration",
+    [
+        "5 minutes",
+        "10 minutes",
+        "15 minutes",
+        "30 minutes",
+        "45 minutes",
+        "1 hour",
+        "1:30 hour",
+        "2 hours",
+    ],
 )
 color = st.selectbox(
     "🎨 Event Color",
@@ -271,12 +287,18 @@ if st.button("📅 Create Event"):
             start_datetime = datetime.datetime.fromisoformat(start_datetime_str)
             if duration == "10 minutes":
                 end_datetime = start_datetime + datetime.timedelta(minutes=10)
+            elif duration == "5 minutes":
+                end_datetime = start_datetime + datetime.timedelta(minutes=5)
             elif duration == "15 minutes":
                 end_datetime = start_datetime + datetime.timedelta(minutes=15)
             elif duration == "30 minutes":
                 end_datetime = start_datetime + datetime.timedelta(minutes=30)
+            elif duration == "45 minutes":
+                end_datetime = start_datetime + datetime.timedelta(minutes=45)
             elif duration == "1 hour":
                 end_datetime = start_datetime + datetime.timedelta(hours=1)
+            elif duration == "1:30 hour":
+                end_datetime = start_datetime + datetime.timedelta(minutes=90)
             elif duration == "2 hours":
                 end_datetime = start_datetime + datetime.timedelta(hours=2)
             end_datetime_str = end_datetime.isoformat()
