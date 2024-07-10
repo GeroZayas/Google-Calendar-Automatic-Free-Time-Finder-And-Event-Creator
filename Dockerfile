@@ -27,4 +27,4 @@ COPY . .
 EXPOSE 8501
 
 # Command to run the Streamlit app
-CMD ["streamlit", "run", "--server.port", "8501", "google_calendar_streamlit_app.py"]
+CMD ["streamlit", "run", "--server.port", "8501", "app.py"]

@@ -8,71 +8,55 @@ import google.oauth2.credentials
 from google.auth.transport.requests import Request
 
 
-from dotenv import load_dotenv
-
-# Load environment variables from .env file
-load_dotenv()
-
-# Path to the credentials and token files
-CREDENTIALS_PATH = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-TOKEN_PATH = os.path.join(os.path.dirname(CREDENTIALS_PATH), "token.json")
-
-
 # ===========================================================================
 # =====================FUNCTIONS=============================================
 # ===========================================================================
+# Function to authenticate and create a service object
+def authenticate_google():
+    creds = None
 
-if not CREDENTIALS_PATH:
-    st.error("GOOGLE_APPLICATION_CREDENTIALS environment variable is not set.")
-else:
-    TOKEN_PATH = os.path.join(os.path.dirname(CREDENTIALS_PATH), "token.json")
-
-    # Function to authenticate and create a service object
-    def authenticate_google():
-        creds = None
-
-        # Check if token.json exists and load credentials from it
-        if os.path.exists(TOKEN_PATH):
-            try:
-                creds = google.oauth2.credentials.Credentials.from_authorized_user_file(
-                    TOKEN_PATH,
-                    scopes=["https://www.googleapis.com/auth/calendar"],
-                )
-            except Exception as e:
-                st.error(f"Error loading credentials from token.json: {e}")
-
-        # If credentials are missing or invalid, assist the user in obtaining them
-        if not creds or not creds.valid:
-            st.warning(
-                "No valid credentials found. Please ensure you have 'credentials.json'."
-            )
-
-            try:
-                # Delete the token.json file if it exists (to start fresh)
-                if os.path.exists(TOKEN_PATH):
-                    os.remove(TOKEN_PATH)
-
-                # Start the OAuth flow to obtain new credentials
-                flow = InstalledAppFlow.from_client_secrets_file(
-                    CREDENTIALS_PATH,
-                    scopes=["https://www.googleapis.com/auth/calendar"],
-                )
-                creds = flow.run_local_server(port=0)
-
-                # Save the obtained credentials to token.json for future use
-                with open(TOKEN_PATH, "w") as token:
-                    token.write(creds.to_json())
-
-            except Exception as e:
-                st.error(f"Error obtaining credentials: {e}")
-
-        # Return the Google Calendar service object using the obtained credentials
+    # Check if token.json exists and load credentials from it
+    if os.path.exists("./credentials/token.json"):
         try:
-            service = build("calendar", "v3", credentials=creds)
-            return service
+            creds = google.oauth2.credentials.Credentials.from_authorized_user_file(
+                "./credentials/token.json",
+                scopes=["https://www.googleapis.com/auth/calendar"],
+            )
         except Exception as e:
-            st.error(f"Error creating Google Calendar service: {e}")
-            return None
+            st.error(f"Error loading credentials from token.json: {e}")
+
+    # If credentials are missing or invalid, assist the user in obtaining them
+    if not creds or not creds.valid:
+        st.warning(
+            "No valid credentials found. Please ensure you have 'credentials.json'."
+        )
+
+        try:
+            # Delete the token.json file if it exists (to start fresh)
+            if os.path.exists("./credentials/token.json"):
+                os.remove("./credentials/token.json")
+
+            # Start the OAuth flow to obtain new credentials
+            flow = InstalledAppFlow.from_client_secrets_file(
+                "./credentials/credentials.json",
+                scopes=["https://www.googleapis.com/auth/calendar"],
+            )
+            creds = flow.run_local_server(port=0)
+
+            # Save the obtained credentials to token.json for future use
+            with open("./credentials/token.json", "w") as token:
+                token.write(creds.to_json())
+
+        except Exception as e:
+            st.error(f"Error obtaining credentials: {e}")
+
+    # Return the Google Calendar service object using the obtained credentials
+    try:
+        service = build("calendar", "v3", credentials=creds)
+        return service
+    except Exception as e:
+        st.error(f"Error creating Google Calendar service: {e}")
+        return None
 
 
 def find_free_time(service, date, duration_str):
