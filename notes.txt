@@ -2,6 +2,3 @@
 
 - Add button that opens official google page / calendar of user
 
-
-
-
