@@ -6,3 +6,4 @@ token.json
 google_calendar_event_creator_tkinter.py
 google_calendar_event_creator.py
 credentials.json
+.env
