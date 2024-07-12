@@ -71,11 +71,11 @@ def authenticate_google():
 
 
 def find_free_time(service, date, duration_str):
-    ###############################
+    # ----------------------------------------------------------------------
     logging.debug(
         f"Calling find_free_time() with service={service}, date={date}, duration_str={duration_str}"
     )
-    ###############################
+    # ----------------------------------------------------------------------
 
     # Parse the duration string
     if duration_str == "10 minutes":
@@ -126,15 +126,15 @@ def find_free_time(service, date, duration_str):
         busy_start = datetime.datetime.fromisoformat(busy_period["start"]).astimezone(
             timezone
         )
-        ###########################################
+        # ----------------------------------------------------------------------
         logging.debug(f"Busy period start: {busy_start}")
-        ###########################################
+        # ----------------------------------------------------------------------
 
         while current_time + duration <= busy_start:
             free_slots.append(current_time.isoformat())
-            ###########################################
+            # ----------------------------------------------------------------------
             logging.debug(f"Found free slot: {current_time.isoformat()}")
-            ###########################################
+            # ----------------------------------------------------------------------
             current_time += datetime.timedelta(
                 minutes=15
             )  # Check every 15 minutes for a free slot
@@ -148,14 +148,14 @@ def find_free_time(service, date, duration_str):
 
     while current_time + duration <= search_end_time:
         free_slots.append(current_time.isoformat())
-        ###########################################
+        # ----------------------------------------------------------------------
         logging.debug(f"Found free slot: {current_time.isoformat()}")
-        ###########################################
+        # ----------------------------------------------------------------------
         current_time += datetime.timedelta(minutes=15)
 
-    ###########################################
+    # ----------------------------------------------------------------------
     logging.debug(f"free_slots: {free_slots}")
-    ###########################################
+    # ----------------------------------------------------------------------
     return free_slots
 
 
