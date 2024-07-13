@@ -14,7 +14,7 @@ import logging
 
 logging.basicConfig(
     filename="logs.log",
-    level=logging.DEBUG,
+    level=logging.INFO,
     format="%(message)s",
 )
 
@@ -445,4 +445,4 @@ with st.expander("🛠️ Modify Event"):
 # CLEAR BUTTON
 # ===========================================================================
 if st.button("Clear"):
-    st.experimental_rerun()
+    st.rerun()
