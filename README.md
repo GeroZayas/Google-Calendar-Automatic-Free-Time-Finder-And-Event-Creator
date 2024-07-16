@@ -22,6 +22,7 @@ Welcome to the Google Calendar Event Creator by Gero Zayas! This application all
 2. **Setup:**
 
    - Obtain your Google Calendar API credentials and save them as `credentials.json`.
+   - Create a folder named "credentials" and put the file `credentials.json` inside.
    - Run the application using Streamlit: `streamlit run app.py`.
 
 3. **Authentication:**
